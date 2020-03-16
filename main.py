@@ -25,7 +25,6 @@ def get(colom, table):
             print("PostgreSQL connection is closed")
 
 
-
 def content_filtering():
     records = get("*", "products")
     category_in_cart = 'Huishouden'
