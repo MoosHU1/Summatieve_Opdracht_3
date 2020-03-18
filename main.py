@@ -3,7 +3,7 @@ import psycopg2
 
 def get(colom, table, limit):
     try:
-        connection = psycopg2.connect("dbname = voordeelshop user=postgres password='okinawa'")
+        connection = psycopg2.connect("dbname = voordeelshop user=postgres password=''")
 
         cursor = connection.cursor()
         if colom == 'a':
@@ -27,7 +27,7 @@ def get(colom, table, limit):
 
 def insert_into_postgres(table, values):
     try:
-        connection = psycopg2.connect("dbname = voordeelshop user=postgres password='okinawa'")
+        connection = psycopg2.connect("dbname = voordeelshop user=postgres password=''")
         cursor = connection.cursor()
 
         if table == "content_recommendations":
