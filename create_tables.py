@@ -2,7 +2,7 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 # Connect to PostgreSQL DBMS
-con = psycopg2.connect("dbname = voordeelshop user=postgres password='okinawa'")
+con = psycopg2.connect("dbname = voordeelshop user=postgres password=''")
 con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
 
 # Obtain a DB Cursor
