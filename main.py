@@ -54,14 +54,16 @@ def content_filtering():
     records = get("*", "products",'50')
 
     recommended_ids = []
-    loop =0
+    already_added = []
     for product_cart in records:
         for product_recommend in records:
             # [4] = Category, [10] = Sellingprice, [7] = targetaudience
             if product_cart != product_recommend and product_recommend[4] == product_cart[4] and \
                     product_cart[10]-5 < product_recommend[10] < product_cart[10]+5 and \
-                    product_recommend[7] == product_cart[7]:
-
+                    product_recommend[7] == product_cart[7] \
+                    and ([product_cart[0],product_recommend[0]]) not in already_added \
+                    and ([product_recommend[0],product_cart[0]]) not in already_added:
+                already_added.append([product_cart[0], product_recommend[0]])
                 insert_into_postgres("content_recommendations", (product_cart[0],product_recommend[0]))
 
 
@@ -73,13 +75,13 @@ def collaborative_filtering_category():  # Profielen koppelen aan categorie
     #   Koppelt een categorie aan elk profiel
     profiles_category = []
     for item in profiles_category_get:
-        if profiles_category_get.count(item) > 2:
+        if profiles_category_get.count(item) >= 2:
             profiles_category.append(item)
 
     profiles_category = set(profiles_category)
 
-    for item in profiles_category:
-        insert_into_postgres("colab_category", (item))
+    # for item in profiles_category:
+    #     insert_into_postgres("colab_category", (item))
 
 
 def collaborative_filtering_others_bought():
@@ -101,4 +103,4 @@ def collaborative_filtering_others_bought():
 
 
 
-collaborative_filtering_category()
+content_filtering()
