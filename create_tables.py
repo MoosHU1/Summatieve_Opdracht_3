@@ -2,7 +2,7 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 # Connect to PostgreSQL DBMS
-con = psycopg2.connect("dbname = voordeelshop user=postgres password=''")
+con = psycopg2.connect("dbname = voordeelshop user=postgres password='okinawa'")
 con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
 
 # Obtain a DB Cursor
@@ -21,13 +21,23 @@ def create_tables():
         )
         ''',
         '''
-        CREATE TABLE colab_recommendations
+        CREATE TABLE colab_category
         (
         profid varchar,
         category varchar,
         FOREIGN KEY (profid) references profiles(id)
         )
-        ''')
+        ''',
+        '''
+        CREATE TABLE colab_others_bought
+        (
+        prodid varchar,
+        prodid_recommend varchar,
+        FOREIGN KEY (prodid) references products(id),
+        FOREIGN KEY (prodid_recommend) references products(id)
+        )
+       '''
+    )
 
     try:
         for command in commands:

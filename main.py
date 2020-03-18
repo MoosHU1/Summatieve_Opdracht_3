@@ -1,13 +1,18 @@
+'''
+Bron 1: https://stackoverflow.com/questions/40942814/remove-commas-from-tuples-in-list
+
+'''
+
 import psycopg2
 
 
 def get(colom, table, limit):
     try:
-        connection = psycopg2.connect("dbname = voordeelshop user=postgres password=''")
+        connection = psycopg2.connect("dbname = voordeelshop user=postgres password='okinawa'")
 
         cursor = connection.cursor()
         if colom == 'a':
-            postgreSQL_select_Query = "SELECT profid, category FROM profiles_previously_viewed, products WHERE prodid = id LIMIT 100;"
+            postgreSQL_select_Query = "SELECT profid, category FROM profiles_previously_viewed, products WHERE prodid = id LIMIT 500;"
 
         elif limit == '':
             postgreSQL_select_Query = "select " +colom+" from " + table
@@ -27,13 +32,15 @@ def get(colom, table, limit):
 
 def insert_into_postgres(table, values):
     try:
-        connection = psycopg2.connect("dbname = voordeelshop user=postgres password=''")
+        connection = psycopg2.connect("dbname = voordeelshop user=postgres password='okinawa'")
         cursor = connection.cursor()
 
         if table == "content_recommendations":
             cursor.execute("""INSERT INTO content_recommendations VALUES({},{})""".format(values[0], values[1]))
-        elif table == "colab_recommendations":
-            cursor.execute("""INSERT INTO colab_recommendations VALUES(%s,%s)""",(values[0], values[1]))
+        elif table == "colab_category":
+            cursor.execute("""INSERT INTO colab_category VALUES(%s,%s)""",(values[0], values[1]))
+        elif table == "colab_others_bought":
+            cursor.execute("""INSERT INTO colab_others_bought VALUES(%s,%s)""", (values[0], values[1]))
 
         connection.commit()
         count = cursor.rowcount
@@ -44,7 +51,7 @@ def insert_into_postgres(table, values):
 
 
 def content_filtering():
-    records = get("*", "products",'10')
+    records = get("*", "products",'50')
 
     recommended_ids = []
     loop =0
@@ -59,9 +66,11 @@ def content_filtering():
 
 
 
-def collaborative_filtering():  # Profielen koppelen aan categorie
+def collaborative_filtering_category():  # Profielen koppelen aan categorie
     profiles_category_get = get("a", "", "")
+    products = get("*", "products", "")
 
+    #   Koppelt een categorie aan elk profiel
     profiles_category = []
     for item in profiles_category_get:
         if profiles_category_get.count(item) > 2:
@@ -70,26 +79,26 @@ def collaborative_filtering():  # Profielen koppelen aan categorie
     profiles_category = set(profiles_category)
 
     for item in profiles_category:
-        print(item)
-        insert_into_postgres("colab_recommendations", (item))
+        insert_into_postgres("colab_category", (item))
+
+
+def collaborative_filtering_others_bought():
+    records = get("*", "profiles_previously_viewed",'100')
+    productids_get = get("id", "products", '')
+
+    productids = [item[0] for item in productids_get] #    Zorgt dat de tuples gewoon strings worden
+
+    # 1 recommendation per product in winkelmandje op basis van andere mensen die
+    # naar hetzelfde product hebben gekeken
+    profid_temp = ''
+    for productid in productids:
+        for record in records:
+            if record[0] == profid_temp:
+                insert_into_postgres("colab_others_bought", (productid, record[1]))
+                profid_temp = ''
+            if productid == record[1]:
+                profid_temp = record[0]
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+collaborative_filtering_category()
