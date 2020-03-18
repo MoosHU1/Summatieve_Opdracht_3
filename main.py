@@ -80,8 +80,8 @@ def collaborative_filtering_category():  # Profielen koppelen aan categorie
 
     profiles_category = set(profiles_category)
 
-    # for item in profiles_category:
-    #     insert_into_postgres("colab_category", (item))
+    for item in profiles_category:
+        insert_into_postgres("colab_category", (item))
 
 
 def collaborative_filtering_others_bought():
