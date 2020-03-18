@@ -44,27 +44,18 @@ def insert_into_postgres(table, values):
 
 
 def content_filtering():
-    records = get("*", "products",'')
-
-    #   Hardcoded voor deze opdracht
-    productid_in_cart = '45416'
-    category_in_cart = 'Huishouden'
-    target_in_cart = 'Vrouwen'
-    sellingprice_in_cart = 190
-
+    records = get("*", "products",'10')
 
     recommended_ids = []
+    loop =0
+    for product_cart in records:
+        for product_recommend in records:
+            # [4] = Category, [10] = Sellingprice, [7] = targetaudience
+            if product_cart != product_recommend and product_recommend[4] == product_cart[4] and \
+                    product_cart[10]-5 < product_recommend[10] < product_cart[10]+5 and \
+                    product_recommend[7] == product_cart[7]:
 
-    for row in records:
-        if row[4] == category_in_cart and \
-                sellingprice_in_cart-20 < row[10] < sellingprice_in_cart+20 and \
-                row[7] == target_in_cart:
-
-            recommended_ids.append(row[0])
-
-    for recommendation in recommended_ids:
-        insert_into_postgres("content_recommendations", (productid, recommendation))
-
+                insert_into_postgres("content_recommendations", (product_cart[0],product_recommend[0]))
 
 
 
@@ -101,37 +92,4 @@ def collaborative_filtering():  # Profielen koppelen aan categorie
 
 
 
-
-
-def collaborative_filtering_test():
-    records = get("*", "profiles_previously_viewed")
-    productids_cart = ['8510', '20371']
-    profids = []
-    prodids =[]
-    for productid in productids_cart: # 1 recommendation per product in winkelmandje
-        for row in records:
-            if row[0] in profids:
-                prodids.append(row[1])
-                profids.remove(row[0])
-                break
-            if row[1] == productid:
-                profids.append(row[0])
-
-
-def collaborative_filtering_test_(): #    Profielen koppelen aan categorie
-    profiles_viewed_category_get = get("a", "", "")
-
-    #   Deze 3 for loops halen alle profielen weg die minder dan 3 producten hebben bekeken
-    profids = []
-    for item in profiles_viewed_category_get:
-        profids.append(item[0])
-
-    for item in profids:
-        if profids.count(item) <=3:
-            profids.remove(item)
-
-    profiles_viewed_category = []
-    for item in profiles_viewed_category_get:
-        if item[0] in profids:
-            profiles_viewed_category.append(item)
 
