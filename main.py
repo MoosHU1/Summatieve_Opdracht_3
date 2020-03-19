@@ -35,6 +35,8 @@ def insert_into_postgres(table, values):
         connection = psycopg2.connect("dbname = voordeelshop user=postgres password=''")
         cursor = connection.cursor()
 
+        #   Kreeg bij de ene execute een error met gebruik van %s en bij de andere met gebruik van .format
+        #   Dus heb de optie gebruikt waar ik geen error bij kreeg
         if table == "content_recommendations":
             cursor.execute("""INSERT INTO content_recommendations VALUES({},{})""".format(values[0], values[1]))
         elif table == "colab_category":
@@ -70,7 +72,6 @@ def content_filtering():
 
 def collaborative_filtering_category():  # Profielen koppelen aan categorie
     profiles_category_get = get("a", "", "")
-    products = get("*", "products", "")
 
     #   Koppelt een categorie aan elk profiel
     profiles_category = []
@@ -104,3 +105,5 @@ def collaborative_filtering_others_bought():
 
 
 content_filtering()
+collaborative_filtering_category()
+collaborative_filtering_others_bought()
