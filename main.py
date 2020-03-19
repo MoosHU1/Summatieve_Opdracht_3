@@ -75,7 +75,7 @@ def collaborative_filtering_category():  # Profielen koppelen aan categorie
     #   Koppelt een categorie aan elk profiel
     profiles_category = []
     for item in profiles_category_get:
-        if profiles_category_get.count(item) >= 2:
+        if profiles_category_get.count(item) >= 3:
             profiles_category.append(item)
 
     profiles_category = set(profiles_category)
